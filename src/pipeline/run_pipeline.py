@@ -7,14 +7,15 @@ def run_single(filepath, star_id, out_dir="data/processed"):
     return time, flux
 def run_batch(raw_dir, out_dir="data/processed"):
     results = []
-    for fname in os.listdir(raw_dir):
-        if fname.endswith(".fits"):
-            star_id = fname.split(".")[0]
-            try:
-                time, flux = run_single(os.path.join(raw_dir, fname), star_id, out_dir)
-                results.append({"star_id": star_id, "status": "ok", "n_points": len(time)})
-            except Exception as e:
-                results.append({"star_id": star_id, "status": "failed", "error": str(e)})
+    for root, dirs, files in os.walk(raw_dir):
+        for fname in files:
+            if fname.endswith(".fits"):
+                star_id = fname.split(".")[0]
+                try:
+                    time, flux = run_single(os.path.join(root, fname), star_id, out_dir)
+                    results.append({"star_id": star_id, "status": "ok", "n_points": len(time)})
+                except Exception as e:
+                    results.append({"star_id": star_id, "status": "failed", "error": str(e)})
     return results
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
